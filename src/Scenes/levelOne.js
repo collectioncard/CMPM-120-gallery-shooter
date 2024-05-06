@@ -147,7 +147,7 @@ class levelOne extends BasicShootingScene {
             newProjectile.setScale(0.5);
             newProjectile.startFollow(
                 {
-                    duration: 1000,
+                    duration: 5000,
                     yoyo: false,
                     repeat: 0
                 }
