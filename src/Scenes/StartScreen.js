@@ -31,7 +31,7 @@ class StartScreen extends BasicShootingScene {
         this.YellowButton = this.add.sprite(250, 409, 'button_yellow').setDepth(-1).setScale(0.75);
         this.GreenButton = this.add.sprite(550, 409, 'button_green').setDepth(-1).setScale(0.75);
 
-        this.insText = this.add.text(200, 500, 'Press A & D to move, space to shoot, \n Shoot an option to select it', { align: 'center', color: 'white' });
+        this.insText = this.add.text(this.screenCenterX, 500, 'Press A & D to move, space to shoot, \n Shoot an option to select it', { align: 'center', color: 'white' }).setOrigin(.5);
 
 
         this.StartButtonText.color = 'black';

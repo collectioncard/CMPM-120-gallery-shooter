@@ -4,8 +4,6 @@ class HighScores extends BasicShootingScene {
     }
     preload() {
         super.preload();
-        const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
-        const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
         this.load.image('button_green', 'space/PNG/UI/buttonGreen.png');
         this.load.image('button_yellow', 'space/PNG/UI/buttonYellow.png');
@@ -14,9 +12,9 @@ class HighScores extends BasicShootingScene {
 
         for (let i = 0; i < 5; i++) {
             if (highscores[i] === undefined) {
-                this.add.text(screenCenterX, screenCenterY + i * 30, `Score ${i+1}: ...`, { fontSize: '20px'}).setOrigin(0.5);
+                this.add.text(this.screenCenterX, this.screenCenterY + i * 30, `Score ${i+1}: ...`, { fontSize: '20px'}).setOrigin(0.5);
             } else {
-                this.add.text(screenCenterX, screenCenterY + i * 30, `Score ${i + 1}: ${highscores[i]}`, { fontSize: '20px'}).setOrigin(0.5);
+                this.add.text(this.screenCenterX, this.screenCenterY + i * 30, `Score ${i + 1}: ${highscores[i]}`, { fontSize: '20px'}).setOrigin(0.5);
             }
         }
 

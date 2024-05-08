@@ -5,27 +5,46 @@ class GameOver extends Phaser.Scene {
     {
         console.log('init', data);
         this.score = data.score;
+        this.lives = data.lives - 1;
+
+        if(this.lives < 0){
+            this.lives = 0;
+        }
     }
 
     constructor() {
         super("GameOver");
         this.score = 0;
+        this.lives = 0;
     }
     preload() {
         this.load.setPath('./assets/');
 
+        this.screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+        this.screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
+
+
     }
     create() {
-        this.add.text(200, 100, 'Game Over', { fontSize: '64px' });
-        this.add.text(200, 200, 'Your score was: ' + this.score, { fontSize: '32px' });
-        this.add.text(50, 500, 'Press the ENTER to return to the main menu', { fontSize: '24px' });
+        //calculate if you win or lost
+        let finaltext = "Game over, You Lose!";
+        let calcScore = this.score + (1000 * this.lives);
+
+        if(this.lives > 0){
+            finaltext = "Game over, You Win!!";
+        }
+
+        this.add.text(this.screenCenterX, 100, finaltext, { fontSize: '64px' }).setOrigin(0.5);
+        this.add.text(this.screenCenterX, 200, 'Your score was: ' + calcScore, { fontSize: '32px' }).setOrigin(0.5);
+        this.add.text(this.screenCenterX, 300, 'Original Score: [' + this.score + "] \n\nHealth bonus: [" + this.lives + "]", { fontSize: '24px' }).setOrigin(0.5);
+        this.add.text(this.screenCenterX, 500, 'Press the ENTER to return to the main menu', { fontSize: '24px' }).setOrigin(0.5);
 
         //write the high score to the hiscore.json file
         // Check if 'highscores' already exists in localStorage
         let highscores = JSON.parse(localStorage.getItem('highscores')) || [];
 
         // Add the new score to the highscores array
-        highscores.push(this.score);
+        highscores.push(calcScore);
 
         // Sort the array in descending order
         highscores.sort((a, b) => b - a);
@@ -36,7 +55,6 @@ class GameOver extends Phaser.Scene {
         // Save the high scores back to localStorage
         localStorage.setItem('highscores', JSON.stringify(highscores));
 
-        console.log(highscores);
 
 
         this.input.keyboard.on('keydown-ENTER', () => {

@@ -11,9 +11,13 @@ class BasicShootingScene extends Phaser.Scene {
     preload() {
         this.load.setPath('./assets/');
 
+        this.screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+        this.screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
+
         //the player sprite and bullets will always be the same. Just register all of them
         this.load.image('player', 'jumper/PNG/Enemies/spikeMan_stand.png');
         this.load.image('projectile', 'space/PNG/Lasers/laserBlue16.png');
+        this.load.image('background', 'space/Backgrounds/blue.png');
     }
 
     create() {
@@ -26,9 +30,12 @@ class BasicShootingScene extends Phaser.Scene {
         this.playerSprite = this.add.sprite(30, 560, 'player').setScale(0.5);
 
         //display the lives left for the player on the top left corner
-        this.livesText = this.add.text(16, 16, 'Lives: 3', { fontSize: '32px' }).setDepth(99);
+        this.livesText = this.add.text(16, 16, 'Lives: 3', {fontSize: '32px'}).setDepth(99);
         //display the score on the top right corner
-        this.scoreText = this.add.text(600, 16, 'Score: 0', { fontSize: '32px' }).setDepth(99);
+        this.scoreText = this.add.text(550, 16, 'Score: 0', {fontSize: '32px'}).setDepth(99);
+
+        //tile the background image
+        this.background = this.add.tileSprite(400, 300, 800, 600, 'background').setDepth(-1000);
 
 
         //default keys for player movement and shooting
@@ -43,39 +50,45 @@ class BasicShootingScene extends Phaser.Scene {
         this.updateText();
 
         //if the player runs out of lives, go to the game over screen
-        if(this.lives <= 0){
-            if(this.boss !== undefined){
+        if (this.lives <= 0) {
+            if (this.boss !== undefined) {
                 this.boss.data = false; //hack, just ignore it
             }
             console.log("This one")
-            this.scene.start("GameOver", {score: this.score});
+            this.scene.start("GameOver", {score: this.score, lives: this.lives});
         }
+
+        //scroll the background image seamlessly
+        this.background.tilePositionY -= .1;
+        this.background.tilePositionX -= .1;
+
     }
+
 
     doPlayerMovement() {
         if (this.aKey.isDown) {
             this.playerSprite.x -= 10;
-            if (this.playerSprite.x <= 20){
+            if (this.playerSprite.x <= 20) {
                 this.playerSprite.x = 20;
             }
         }
 
         if (this.dKey.isDown) {
             this.playerSprite.x += 10;
-            if (this.playerSprite.x >= 780){
+            if (this.playerSprite.x >= 780) {
                 this.playerSprite.x = 780;
             }
         }
     }
 
     fireProjectile() {
-        if (Phaser.Input.Keyboard.JustDown(this.spaceKey) && this.playerProjectileArray.length < 20){
+        if (Phaser.Input.Keyboard.JustDown(this.spaceKey) && this.playerProjectileArray.length < 20) {
             this.projectileSprite = this.add.sprite(this.playerSprite.x, this.playerSprite.y - 50, 'projectile');
             this.playerProjectileArray.push(this.projectileSprite);
         }
-        for(let i = 0; i < this.playerProjectileArray.length; i++){
+        for (let i = 0; i < this.playerProjectileArray.length; i++) {
             this.playerProjectileArray[i].y -= 10;
-            if(this.playerProjectileArray[i].y <= 0){
+            if (this.playerProjectileArray[i].y <= 0) {
                 this.playerProjectileArray[i].destroy();
                 this.playerProjectileArray.splice(i, 1);
             }
@@ -83,32 +96,32 @@ class BasicShootingScene extends Phaser.Scene {
     }
 
     doesOverlap(sprite1, sprite2) {
-        if(Math.abs(sprite1.x - sprite2.x) > (sprite1.displayWidth / 2 + sprite2.displayWidth / 2)){
+        if (Math.abs(sprite1.x - sprite2.x) > (sprite1.displayWidth / 2 + sprite2.displayWidth / 2)) {
             return false;
         }
-        if(Math.abs(sprite1.y - sprite2.y) > (sprite1.displayHeight / 2 + sprite2.displayHeight / 2)){
+        if (Math.abs(sprite1.y - sprite2.y) > (sprite1.displayHeight / 2 + sprite2.displayHeight / 2)) {
             return false;
         }
         return true;
     }
 
-    //returns an array starting at the xy coords of the current sprite and ending at the xy coords 30 pixels past the current target following the same angle assuming that sprite 2 is the one we want to go past.
+//returns an array starting at the xy coords of the current sprite and ending at the xy coords 30 pixels past the current target following the same angle assuming that sprite 2 is the one we want to go past.
     createExtendedSpline(sprite1, sprite2) {
-    // Get the angle between the two sprites
-    let angle = Phaser.Math.Angle.Between(sprite1.x, sprite1.y, sprite2.x, sprite2.y);
+        // Get the angle between the two sprites
+        let angle = Phaser.Math.Angle.Between(sprite1.x, sprite1.y, sprite2.x, sprite2.y);
 
-    // Create a spline from the current sprite to a point 1000 pixels past the target sprite
-    let spline = [
-        sprite1.x, sprite1.y,
-        sprite2.x + Math.cos(angle) * 1000,
-        sprite2.y + Math.sin(angle) * 1000
-    ];
+        // Create a spline from the current sprite to a point 1000 pixels past the target sprite
+        let spline = [
+            sprite1.x, sprite1.y,
+            sprite2.x + Math.cos(angle) * 1000,
+            sprite2.y + Math.sin(angle) * 1000
+        ];
 
-    return new Phaser.Curves.Spline(spline);
-}
+        return new Phaser.Curves.Spline(spline);
+    }
 
-    //returns an array starting at the xy coords of the current sprite and ending at the xy coords of the target sprite
-    createSpline(sprite1, sprite2){
+//returns an array starting at the xy coords of the current sprite and ending at the xy coords of the target sprite
+    createSpline(sprite1, sprite2) {
         let spline = [
             sprite1.x, sprite1.y,
             sprite2.x, sprite2.y
@@ -116,9 +129,11 @@ class BasicShootingScene extends Phaser.Scene {
         return new Phaser.Curves.Spline(spline);
     }
 
-    //update the score and lives text
-    updateText(){
+//update the score and lives text
+    updateText() {
         this.livesText.setText('Lives: ' + this.lives);
         this.scoreText.setText('Score: ' + this.score);
     }
+
+
 }
