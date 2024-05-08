@@ -27,7 +27,7 @@ class levelOne extends BasicShootingScene {
         super.create();
 
         //reinit all of the scene variables
-        this.totalDucks = 1;
+        this.totalDucks = 100;
         this.score = 0;
         this.lives = 3;
         this.spawnRate = 0.005;
