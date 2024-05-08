@@ -26,9 +26,9 @@ class BasicShootingScene extends Phaser.Scene {
         this.playerSprite = this.add.sprite(30, 560, 'player').setScale(0.5);
 
         //display the lives left for the player on the top left corner
-        this.livesText = this.add.text(16, 16, 'Lives: 3', { fontSize: '32px' });
+        this.livesText = this.add.text(16, 16, 'Lives: 3', { fontSize: '32px' }).setDepth(99);
         //display the score on the top right corner
-        this.scoreText = this.add.text(600, 16, 'Score: 0', { fontSize: '32px' });
+        this.scoreText = this.add.text(600, 16, 'Score: 0', { fontSize: '32px' }).setDepth(99);
 
 
         //default keys for player movement and shooting
@@ -44,6 +44,10 @@ class BasicShootingScene extends Phaser.Scene {
 
         //if the player runs out of lives, go to the game over screen
         if(this.lives <= 0){
+            if(this.boss !== undefined){
+                this.boss.data = false; //hack, just ignore it
+            }
+            console.log("This one")
             this.scene.start("GameOver", {score: this.score});
         }
     }
