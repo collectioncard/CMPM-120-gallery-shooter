@@ -3,7 +3,6 @@ class BasicShootingScene extends Phaser.Scene {
     constructor(levelName) {
         super(levelName);
 
-
         this.score = 0;
         this.lives = 3;
     }
@@ -54,7 +53,6 @@ class BasicShootingScene extends Phaser.Scene {
             if (this.boss !== undefined) {
                 this.boss.data = false; //hack, just ignore it
             }
-            console.log("This one")
             this.scene.start("GameOver", {score: this.score, lives: this.lives});
         }
 
@@ -82,10 +80,13 @@ class BasicShootingScene extends Phaser.Scene {
     }
 
     fireProjectile() {
+        //fire a projectile if the space key is pressed and there are less than 20 projectiles on the screen
         if (Phaser.Input.Keyboard.JustDown(this.spaceKey) && this.playerProjectileArray.length < 20) {
             this.projectileSprite = this.add.sprite(this.playerSprite.x, this.playerSprite.y - 50, 'projectile');
             this.playerProjectileArray.push(this.projectileSprite);
         }
+
+        //move all of the projectiles up the screen and remove them if they go off the screen
         for (let i = 0; i < this.playerProjectileArray.length; i++) {
             this.playerProjectileArray[i].y -= 10;
             if (this.playerProjectileArray[i].y <= 0) {
@@ -105,7 +106,7 @@ class BasicShootingScene extends Phaser.Scene {
         return true;
     }
 
-//returns an array starting at the xy coords of the current sprite and ending at the xy coords 30 pixels past the current target following the same angle assuming that sprite 2 is the one we want to go past.
+    //returns an array starting at the xy coords of the current sprite and ending at the xy coords 30 pixels past the current target following the same angle assuming that sprite 2 is the one we want to go past.
     createExtendedSpline(sprite1, sprite2) {
         // Get the angle between the two sprites
         let angle = Phaser.Math.Angle.Between(sprite1.x, sprite1.y, sprite2.x, sprite2.y);
@@ -120,7 +121,7 @@ class BasicShootingScene extends Phaser.Scene {
         return new Phaser.Curves.Spline(spline);
     }
 
-//returns an array starting at the xy coords of the current sprite and ending at the xy coords of the target sprite
+    //returns an array starting at the xy coords of the current sprite and ending at the xy coords of the target sprite
     createSpline(sprite1, sprite2) {
         let spline = [
             sprite1.x, sprite1.y,
@@ -129,7 +130,7 @@ class BasicShootingScene extends Phaser.Scene {
         return new Phaser.Curves.Spline(spline);
     }
 
-//update the score and lives text
+    //update the score and lives text
     updateText() {
         this.livesText.setText('Lives: ' + this.lives);
         this.scoreText.setText('Score: ' + this.score);

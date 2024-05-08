@@ -1,7 +1,10 @@
 class BossBattle extends BasicShootingScene {
 
+    constructor() {
+        super("BossBattle");
+    }
+
     init(data) {
-        console.log('init', data);
         this.score = data.score;
         this.stage = "buildUp";
         this.boss = undefined;
@@ -12,11 +15,6 @@ class BossBattle extends BasicShootingScene {
 
         //debug
         console.log("Press + to increase bullet rate, - to decrease bullet rate");
-
-    }
-
-    constructor() {
-        super("BossBattle");
     }
 
     preload() {
@@ -38,9 +36,13 @@ class BossBattle extends BasicShootingScene {
         //inc and dec the bullet rate with the + and - key
         this.plusKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.PLUS);
         this.minusKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.MINUS);
-
     }
 
+    //Stages of the battle,
+    //1. A small white circle appears at the center of the screen
+    //2. ducks fly from the edges of the screen to the center, into the circle
+    //3. The circle grows until the screen is filled with white
+    //4. The boss appears (giant dirty duck) and the player must fight it
     update() {
         super.update();
 
@@ -53,8 +55,8 @@ class BossBattle extends BasicShootingScene {
             this.bulletRate -= 0.01;
             console.log("Bullet Rate dec to: " + this.bulletRate);
         }
+        ////END DEBUG CODE
 
-        //end debug
 
         if (this.stage === "buildUp") {
 
@@ -177,12 +179,7 @@ class BossBattle extends BasicShootingScene {
 
     }
 
-    //Stages of the battle,
-    //1. A small white circle appears at the center of the screen
-    //2. ducks fly from the edges of the screen to the center, into the circle
-    //3. The circle grows until the screen is filled with white
-    //4. The boss appears (giant dirty duck) and the player must fight it
-
+    //destroys all of the sprites in an array and then clears the array
     deleteArray(array) {
         for (let i = 0; i < array.length; i++) {
             array[i].active = false;
@@ -190,7 +187,6 @@ class BossBattle extends BasicShootingScene {
         }
         this.enemyProjectileArray = [];
     }
-
 
     //a function that chooses a random coordinate on the border of the screen
     randomBorderCoordinate() {
@@ -208,7 +204,6 @@ class BossBattle extends BasicShootingScene {
         }
     }
 
-
     doCollisionCheck() {
         // Check for collision between player projectiles and boss
         this.playerProjectileArray = this.playerProjectileArray.filter((projectile, i) => {
@@ -218,7 +213,6 @@ class BossBattle extends BasicShootingScene {
                 if (this.boss.data.health < 1) {
                     this.stage = "END";
                 }
-                console.log(this.boss.data.health);
                 return false;
             }
             return true;
@@ -256,12 +250,6 @@ class BossBattle extends BasicShootingScene {
     spawnPlayerTargeted(sourceSprite, texture, array) {
         let tempSpline = this.createExtendedSpline(sourceSprite, this.playerSprite);
         let newProjectile = this.add.follower(tempSpline, sourceSprite.x, sourceSprite.y, texture);
-        if (texture === "health_pack") {
-            newProjectile.setScale(2);
-            newProjectile.setData("isHealth", true);
-        } else {
-            newProjectile.setScale(1);
-        }
 
         newProjectile.startFollow(
             {
@@ -269,7 +257,7 @@ class BossBattle extends BasicShootingScene {
                 yoyo: false,
                 repeat: 0
             }
-        ).setDepth(-1)
+        ).setDepth(-1);
         array.push(newProjectile);
     }
 
@@ -278,14 +266,8 @@ class BossBattle extends BasicShootingScene {
         let tempSpline = new Phaser.Curves.Spline([
             sourceSprite.x, sourceSprite.y,
             randLoc.x, randLoc.y
-        ])
+        ]);
         let newProjectile = this.add.follower(tempSpline, sourceSprite.x, sourceSprite.y, texture);
-        if (texture === "health_pack") {
-            newProjectile.setScale(2);
-            newProjectile.setData("isHealth", true);
-        } else {
-            newProjectile.setScale(1);
-        }
 
         newProjectile.startFollow(
             {
@@ -293,7 +275,7 @@ class BossBattle extends BasicShootingScene {
                 yoyo: false,
                 repeat: 0
             }
-        ).setDepth(-1)
+        ).setDepth(-1);
         array.push(newProjectile);
     }
 
@@ -303,23 +285,26 @@ class BossBattle extends BasicShootingScene {
             this.boss.setY(this.follower.y);
             return;
         }
-        console.log("AAAA");
+
         //get a random location
         let randLoc = this.randomBorderCoordinate();
         //if it is lower that 400, move it up
         if (randLoc.y > 300) {
             randLoc.y = Math.random() * 300;
         }
+
         //create a spline to the new location
         let tempSpline = new Phaser.Curves.Spline([
             this.boss.x, this.boss.y,
             randLoc.x, randLoc.y
-        ])
+        ]);
         this.follower.destroy();
+
         //create a follower
         this.follower = this.add.follower(tempSpline, this.boss.x, this.boss.y, 'duck_dirty')
             .setScale(.03)
             .setDepth(-99);
+
         //move the follower along the spline
         this.follower.startFollow({
             duration: 1000,
@@ -332,16 +317,16 @@ class BossBattle extends BasicShootingScene {
         //spawn bullets
         if (Math.random() < this.bulletRate) {
             this.spawnRandomTargeted(this.boss, "dirt_projectile", this.enemyProjectileArray)
+
             if (Math.random() < .5) {
                 this.spawnPlayerTargeted(this.boss, "dirt_projectile", this.enemyProjectileArray)
             }
         }
 
-
         //update health bar
         this.healthBar.width = this.boss.data.health * 4;
 
-        //remove any stray bullets that shouldnt be there
+        //remove any stray bullets that shouldn't be there
         this.enemyProjectileArray = this.enemyProjectileArray.filter((enemyProjectile) => {
             if (!enemyProjectile.isFollowing()) {
                 enemyProjectile.destroy();
@@ -349,7 +334,6 @@ class BossBattle extends BasicShootingScene {
             }
             return true;
         });
-
 
         //check collision
         this.doCollisionCheck();

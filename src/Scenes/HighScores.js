@@ -1,35 +1,37 @@
 class HighScores extends BasicShootingScene {
     constructor() {
         super("HighScores");
+        this.highscores = [];
     }
+
+    init(data) {
+        this.highscores = JSON.parse(localStorage.getItem('highscores')) || [];
+    }
+
     preload() {
         super.preload();
 
         this.load.image('button_green', 'space/PNG/UI/buttonGreen.png');
         this.load.image('button_yellow', 'space/PNG/UI/buttonYellow.png');
-
-        let highscores = JSON.parse(localStorage.getItem('highscores')) || [];
-
-        for (let i = 0; i < 5; i++) {
-            if (highscores[i] === undefined) {
-                this.add.text(this.screenCenterX, this.screenCenterY + i * 30, `Score ${i+1}: ...`, { fontSize: '20px'}).setOrigin(0.5);
-            } else {
-                this.add.text(this.screenCenterX, this.screenCenterY + i * 30, `Score ${i + 1}: ${highscores[i]}`, { fontSize: '20px'}).setOrigin(0.5);
-            }
-        }
-
-
     }
+
     create() {
         super.create();
 
+        //add the scores to the screen
+        for (let i = 0; i < 5; i++) {
+            if (this.highscores[i] === undefined) {
+                this.add.text(this.screenCenterX, this.screenCenterY + i * 30, `Score ${i+1}: ...`, { fontSize: '20px'}).setOrigin(0.5);
+            } else {
+                this.add.text(this.screenCenterX, this.screenCenterY + i * 30, `Score ${i + 1}: ${this.highscores[i]}`, { fontSize: '20px'}).setOrigin(0.5);
+            }
+        }
+
         this.GreenButton = this.add.sprite(125, 59, 'button_green').setDepth(-1).setScale(0.75);
-        this.HighScoreButtonText = this.add.text(65, 50, 'Clear Scores', { align: 'center', color: 'black' });
+        this.add.text(65, 50, 'Clear Scores', { align: 'center', color: 'black' });
 
         this.YellowButton = this.add.sprite(675, 59, 'button_yellow').setDepth(-1).setScale(0.75);
-        this.StartButtonText = this.add.text(645, 50, 'Go Back', { align: 'center', color: 'black'});
-
-
+        this.add.text(645, 50, 'Go Back', { align: 'center', color: 'black'});
 
         //we dont want to display the lives or score on the start screen
         this.livesText.visible = false;

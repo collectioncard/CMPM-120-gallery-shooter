@@ -16,6 +16,7 @@ class StartScreen extends BasicShootingScene {
 
     create() {
         super.create();
+
         ///TEXT STUFF
         this.TitleText = this.add.text(400, 300, 'DUCK WASHING\nSIMULATOR', { align: 'center' });
         this.TitleText.setOrigin(1, 3)
@@ -26,17 +27,16 @@ class StartScreen extends BasicShootingScene {
             .setShadow(8, 8)
             .rotation = -0.1;
 
-        this.HighScoreButtonText = this.add.text(500, 400, 'High Scores', { align: 'center', color: 'black' });
-        this.StartButtonText = this.add.text(200, 400, 'Start Game', { align: 'center', color: 'black'});
-        this.YellowButton = this.add.sprite(250, 409, 'button_yellow').setDepth(-1).setScale(0.75);
+
         this.GreenButton = this.add.sprite(550, 409, 'button_green').setDepth(-1).setScale(0.75);
+        this.add.text(500, 400, 'High Scores', { align: 'center', color: 'black' });
 
-        this.insText = this.add.text(this.screenCenterX, 500, 'Press A & D to move, space to shoot, \n Shoot an option to select it', { align: 'center', color: 'white' }).setOrigin(.5);
+        this.YellowButton = this.add.sprite(250, 409, 'button_yellow').setDepth(-1).setScale(0.75);
+        this.add.text(200, 400, 'Start Game', { align: 'center', color: 'black'});
 
+        this.add.text(this.screenCenterX, 500, 'Press A & D to move, space to shoot, \n Shoot an option to select it', { align: 'center', color: 'white' }).setOrigin(.5);
 
-        this.StartButtonText.color = 'black';
-
-        //we dont want to display the lives or score on the start screen
+        //we don't want to display the lives or score on the start screen
         this.livesText.visible = false;
         this.scoreText.visible = false;
     }

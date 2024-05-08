@@ -4,6 +4,13 @@ class levelOne extends BasicShootingScene {
         super("levelOne");
     }
 
+    init(data) {
+        this.totalDucks = 100;
+        this.score = 0;
+        this.lives = 3;
+        this.spawnRate = 0.005;
+    }
+
     preload() {
         super.preload();
 
@@ -25,12 +32,6 @@ class levelOne extends BasicShootingScene {
 
     create() {
         super.create();
-
-        //reinit all of the scene variables
-        this.totalDucks = 100;
-        this.score = 0;
-        this.lives = 3;
-        this.spawnRate = 0.005;
 
         //get the enemy behavior json file
         this.enemyBehavior = this.cache.json.get('enemyBehavior');
@@ -56,7 +57,6 @@ class levelOne extends BasicShootingScene {
 
         //spawn duck bullets
         for (let i = 0; i < this.enemyArray.length; i++) {
-
             //randomly decide to spawn projectile
             if (Math.random() < 0.01) {
                 this.spawnPlayerTargeted(this.enemyArray[i], "dirt_projectile", this.enemyProjectileArray)
@@ -64,7 +64,6 @@ class levelOne extends BasicShootingScene {
 
             //check to see if this duck needs to be turned into a low duck
             this.spawnLowDuck(this.enemyArray[i]);
-
         }
 
         //and finally check to see if we met the game end condition
@@ -77,8 +76,6 @@ class levelOne extends BasicShootingScene {
                 this.spawnRandomDuck()
             }
         }
-
-
     }
 
 
@@ -126,27 +123,27 @@ class levelOne extends BasicShootingScene {
             }
             return true;
         });
-
-
     }
 
     //Removes any ducks that are below the screen (over y=600)
     cleanUpOldDucks(){
         //Remove any ducks that have left the screen
-        for (let i = 0; i < this.enemyArray.length; i++) {
-            if (this.enemyArray[i].y >= 600) {
-                this.enemyArray[i].destroy();
-                this.enemyArray.splice(i, 1);
+        this.enemyArray = this.enemyArray.filter((enemy) => {
+            if (enemy.y >= 600) {
+                enemy.destroy();
+                return false;
             }
-        }
+            return true;
+        });
 
-        //and the projectiles too
-        for (let i = 0; i < this.enemyProjectileArray.length; i++) {
-            if (this.enemyProjectileArray[i].y >= 600) {
-                this.enemyProjectileArray[i].destroy();
-                this.enemyProjectileArray.splice(i, 1);
+        //Remove any projectiles that have left the screen
+        this.enemyProjectileArray = this.enemyProjectileArray.filter((enemyProjectile) => {
+            if (enemyProjectile.y >= 600) {
+                enemyProjectile.destroy();
+                return false;
             }
-        }
+            return true;
+        });
     }
 
     //spawns a duck aimed at a player, acts like a bullet
@@ -174,6 +171,7 @@ class levelOne extends BasicShootingScene {
     spawnPlayerTargeted(sourceSprite, texture, array) {
         let tempSpline = this.createExtendedSpline(sourceSprite, this.playerSprite);
         let newProjectile = this.add.follower(tempSpline, sourceSprite.x, sourceSprite.y, texture);
+
         if(texture === "health_pack"){
             newProjectile.setScale(2);
             newProjectile.setData("isHealth", true);
@@ -188,6 +186,7 @@ class levelOne extends BasicShootingScene {
                 repeat: 0
             }
         )
+
         array.push(newProjectile);
     }
 
@@ -197,10 +196,9 @@ class levelOne extends BasicShootingScene {
             //make this happen only a tiny amt of the time
             if(Math.random() < 0.07){
                 return;
-            }else{
-                console.log("duck_health")
             }
         }
+
         this.totalDucks--;
         let spline = new Phaser.Curves.Spline(behavior.path);
 
@@ -225,7 +223,6 @@ class levelOne extends BasicShootingScene {
         }
 
         this.enemyArray.push(newDuck);
-        console.log(this.totalDucks);
+        console.log("Ducks left in level: " + this.totalDucks);
     }
-
 }
